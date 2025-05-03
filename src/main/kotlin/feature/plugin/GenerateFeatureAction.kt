@@ -19,12 +19,11 @@ class GenerateFeatureAction : AnAction() {
             Messages.getQuestionIcon()
         ) ?: return
 
-        val featureName = rawInput.lowercase() // folder and package
-        val className = rawInput.replaceFirstChar { it.uppercaseChar() } // for class names
+        val featureName = rawInput.lowercase()
+        val className = rawInput.replaceFirstChar { it.uppercaseChar() }
 
         val targetDir = File(baseDir.path, featureName).apply { mkdirs() }
 
-        // Try to extract the correct package
         val srcIndex = baseDir.path.indexOf("src/")
         val packagePath = if (srcIndex != -1) {
             baseDir.path
@@ -39,19 +38,28 @@ class GenerateFeatureAction : AnAction() {
 
         val fullFeaturePackage = "$packagePath.$featureName"
 
-        // 0. Contract
+        // 0. State
+        File(targetDir, "${className}State.kt").writeText(
+            """
+            package $fullFeaturePackage
+
+            import androidx.compose.runtime.Immutable
+
+            @Immutable
+            internal data object ${className}State
+            """.trimIndent()
+        )
+
+        // 1. Contract
         File(targetDir, "${className}Contract.kt").writeText(
             """
             package $fullFeaturePackage
 
-            internal interface ${className}Contract {
-
-                companion object Empty : ${className}Contract
-            }
+            internal interface ${className}Contract
             """.trimIndent()
         )
 
-        // 1. Screen
+        // 2. Screen
         File(targetDir, "${className}Screen.kt").writeText(
             """
             package $fullFeaturePackage
@@ -59,29 +67,39 @@ class GenerateFeatureAction : AnAction() {
             import androidx.compose.runtime.Composable
 
             @Composable
-            internal fun ${className}Screen() {
+            internal fun ${className}Screen(
+                state: ${className}State,
+                contract: ${className}Contract
+            ) {
             }
             """.trimIndent()
         )
 
-        // 2. ViewModel
+        // 3. ViewModel
         File(targetDir, "${className}ViewModel.kt").writeText(
             """
             package $fullFeaturePackage
+            
+            import com.grippo.core.BaseViewModel
 
-            public class ${className}ViewModel : BaseViewModel<Unit, ${className}Direction>(Unit), ${className}Contract
+            internal class ${className}ViewModel :
+                BaseViewModel<${className}State, ${className}Direction>(${className}State),
+                ${className}Contract
             """.trimIndent()
         )
 
-        // 3. Component
+        // 4. Component
         File(targetDir, "${className}Component.kt").writeText(
             """
             package $fullFeaturePackage
 
             import com.arkivanov.decompose.ComponentContext
             import androidx.compose.runtime.Composable
+            import com.grippo.core.collectAsStateMultiplatform
+            import com.grippo.core.BaseComponent
+            import com.arkivanov.essenty.instancekeeper.retainedInstance
 
-            public class ${className}Component(
+            internal class ${className}Component(
                 componentContext: ComponentContext,
             ) : BaseComponent<${className}Direction>(componentContext) {
 
@@ -94,18 +112,21 @@ class GenerateFeatureAction : AnAction() {
 
                 @Composable
                 override fun Render() {
-                    ${className}Screen()
+                    val state = viewModel.state.collectAsStateMultiplatform()
+                    ${className}Screen(state.value, viewModel)
                 }
             }
             """.trimIndent()
         )
 
-        // 4. Direction
+        // 5. Direction
         File(targetDir, "${className}Direction.kt").writeText(
             """
             package $fullFeaturePackage
+            
+            import com.grippo.core.models.BaseDirection
 
-            public sealed interface ${className}Direction : BaseDirection
+            internal sealed interface ${className}Direction : BaseDirection
             """.trimIndent()
         )
 
