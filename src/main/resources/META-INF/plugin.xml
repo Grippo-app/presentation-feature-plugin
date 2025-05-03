@@ -1,0 +1,23 @@
+<idea-plugin>
+    <id>dev.your.featuregenerator</id>
+    <name>Compose Feature Generator</name>
+    <version>1.0</version>
+    <vendor>YourName</vendor>
+
+    <description>
+        ПTo create new screen feature with Component, ViewModel, Screen and Direction.
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <idea-version since-build="241.0" until-build="999.*"/>
+
+    <actions>
+        <action id="GenerateFeatureAction"
+            class="feature.plugin.GenerateFeatureAction"
+            text="Presentation Feature"
+            description="To create new screen feature">
+            <add-to-group group-id="NewGroup" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
