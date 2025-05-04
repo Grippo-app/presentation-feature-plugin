@@ -65,10 +65,12 @@ class GenerateFeatureAction : AnAction() {
             package $fullFeaturePackage
 
             import androidx.compose.runtime.Composable
+            import kotlinx.collections.immutable.ImmutableSet
 
             @Composable
             internal fun ${className}Screen(
                 state: ${className}State,
+                loaders: ImmutableSet<${className}Loader>,
                 contract: ${className}Contract
             ) {
             }
@@ -99,13 +101,14 @@ class GenerateFeatureAction : AnAction() {
             import com.grippo.core.collectAsStateMultiplatform
             import com.grippo.core.BaseComponent
             import com.arkivanov.essenty.instancekeeper.retainedInstance
+            import org.koin.core.context.getKoin
 
             internal class ${className}Component(
                 componentContext: ComponentContext,
             ) : BaseComponent<${className}Direction>(componentContext) {
 
                 override val viewModel = componentContext.retainedInstance {
-                    ${className}ViewModel()
+                    ${className}ViewModel(getKoin().get(), getKoin().get())
                 }
 
                 override suspend fun eventListener(rout: ${className}Direction) {
@@ -114,7 +117,8 @@ class GenerateFeatureAction : AnAction() {
                 @Composable
                 override fun Render() {
                     val state = viewModel.state.collectAsStateMultiplatform()
-                    ${className}Screen(state.value, viewModel)
+                    val loaders = viewModel.loaders.collectAsStateMultiplatform()
+                    ${className}Screen(state.value, loaders.value, viewModel)
                 }
             }
             """.trimIndent()
