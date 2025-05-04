@@ -79,12 +79,13 @@ class GenerateFeatureAction : AnAction() {
         File(targetDir, "${className}ViewModel.kt").writeText(
             """
             package $fullFeaturePackage
-            
+    
             import com.grippo.core.BaseViewModel
 
             internal class ${className}ViewModel :
-                BaseViewModel<${className}State, ${className}Direction>(${className}State),
-                ${className}Contract
+            BaseViewModel<${className}State, ${className}Direction, ${className}Loader>(${className}State),
+            ${className}Contract {
+            }
             """.trimIndent()
         )
 
@@ -127,6 +128,16 @@ class GenerateFeatureAction : AnAction() {
             import com.grippo.core.models.BaseDirection
 
             internal sealed interface ${className}Direction : BaseDirection
+            """.trimIndent()
+        )
+
+        File(targetDir, "${className}Loader.kt").writeText(
+            """
+            package $fullFeaturePackage
+
+            import com.grippo.core.models.BaseLoader
+
+            internal sealed interface ${className}Loader : BaseLoader
             """.trimIndent()
         )
 
