@@ -111,7 +111,7 @@ class GenerateFeatureAction : AnAction() {
                     ${className}ViewModel()
                 }
 
-                override suspend fun eventListener(rout: ${className}Direction) {
+                override suspend fun eventListener(direction: ${className}Direction) {
                 }
 
                 @Composable
