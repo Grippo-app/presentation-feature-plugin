@@ -55,7 +55,10 @@ class GenerateFeatureAction : AnAction() {
             """
             package $fullFeaturePackage
 
-            internal interface ${className}Contract
+            internal interface ${className}Contract {
+
+                companion object Empty : ${className}Contract
+            }
             """.trimIndent()
         )
 
