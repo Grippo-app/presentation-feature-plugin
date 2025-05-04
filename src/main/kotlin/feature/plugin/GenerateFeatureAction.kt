@@ -84,9 +84,7 @@ class GenerateFeatureAction : AnAction() {
     
             import com.grippo.core.BaseViewModel
 
-            internal class ${className}ViewModel :
-            BaseViewModel<${className}State, ${className}Direction, ${className}Loader>(${className}State),
-            ${className}Contract {
+            internal class ${className}ViewModel : BaseViewModel<${className}State, ${className}Direction, ${className}Loader>(${className}State), ${className}Contract {
             }
             """.trimIndent()
         )
@@ -101,14 +99,13 @@ class GenerateFeatureAction : AnAction() {
             import com.grippo.core.collectAsStateMultiplatform
             import com.grippo.core.BaseComponent
             import com.arkivanov.essenty.instancekeeper.retainedInstance
-            import org.koin.core.context.getKoin
 
             internal class ${className}Component(
                 componentContext: ComponentContext,
             ) : BaseComponent<${className}Direction>(componentContext) {
 
                 override val viewModel = componentContext.retainedInstance {
-                    ${className}ViewModel(getKoin().get(), getKoin().get())
+                    ${className}ViewModel()
                 }
 
                 override suspend fun eventListener(rout: ${className}Direction) {
