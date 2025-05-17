@@ -69,13 +69,14 @@ class GenerateFeatureAction : AnAction() {
 
             import androidx.compose.runtime.Composable
             import kotlinx.collections.immutable.ImmutableSet
+            import com.grippo.core.BaseComposeScreen
 
             @Composable
             internal fun ${className}Screen(
                 state: ${className}State,
                 loaders: ImmutableSet<${className}Loader>,
                 contract: ${className}Contract
-            ) {
+            ) = BaseComposeScreen {
             }
             """.trimIndent()
         )
